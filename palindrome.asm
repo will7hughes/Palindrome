@@ -64,16 +64,18 @@ M=D                 //M[KBD] + 6=M[R1] <-- We're putting temp character into it'
 (CHECK_PALINDROME)
 // Setup D=D-A to check if they are zero, and we will jump if it is (w/ label)
 @R3             // A=R3         <-- location of last character
-D=M             // D=M[R3]     <-- last character
-@R6            // A=R6
-A=M             // A=M[R6] <-- (first) character stored in A
-
+D=M             // A=R3     D=M[R3]     <-- last character index (ABBA 9)
+A=D             // A=M[R3]  D=M[R3] <-- last character char
+D=M             // D[M[R3]]= M[R3]
+@R6             // A=R6     D=M[R3]
+A=M             // A=M[R6]  D=M[R3] <-- (first) character stored in A
 // Check M[KBD+1] with M[R3] or first character and last 
 D=D-A
 @SETUP_NEXT_CHAR
 D;JEQ
 
 (STOP)
+@77
 @STOP
 0;JMP
 
@@ -82,11 +84,26 @@ D;JEQ
 // 0;JMP
 
 (SETUP_NEXT_CHAR)
+// Increment R4
+@R4         //A=R4
+D=M         //A=R4 D=M[R4]
+M=D+1       //A=R4 D=M[R4] M[R4] = M[R4] + 1
+// Increment R4
+
+@R3         //A=R3
+D=M         //A=R3 D=M[R3]
+M=D-1       //A=R3 D=M[R3] M[R3] = M[R3] - 1
+@TEST
+0;JEQ
+
 @SETUP_NEXT_CHAR
 0;JMP
 
 
-
+(TEST)
+@22
+@TEST
+0;JMP
 
 
 
