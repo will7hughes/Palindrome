@@ -106,11 +106,12 @@ D=D-A
 D;JEQ
 
 // Not Equal, Fail
-@-1
-D=M
 @R0
-A=D
+D=M-1
+@R0
+M=D
 (FAIL)
+@33
 @FAIL
 0;JMP
 
