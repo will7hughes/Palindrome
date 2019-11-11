@@ -14,6 +14,10 @@
 //R6 2nd char read
 //R7 3rd char read
 
+@R4
+D=M
+M=1
+
 
 //Making R2 -1 because later on we are incrementing before we use it
 
@@ -61,22 +65,58 @@ M=D                 //M[KBD] + 6=M[R1] <-- We're putting temp character into it'
 @START
 0;JMP
 
+
+// // Increment R4
+// @R4         //A=R4
+// D=M         //A=R4 D=M[R4]
+// M=D+1       //A=R4 D=M[R4] M[R4] = M[R4] + 1
+// // Increment R4
+
 (CHECK_PALINDROME)
+// Must store value of addition of M[R4] + 6 in R5
+@R4             // A=R4         <-- location of first char
+D=M             // A=R4     D=M[R4] <--- offset of first char
+@R5             // A=R6     D=M[R4]
+M=D+A           // A=M[R6 + M[R4]]  D=M[R4] <-- (first) character 
+
+// Check if R3 = R5, end successful
+@R3
+D=M
+@R5
+A=M
+D=D-A
+@SUCCESS
+D;JEQ
+
 // Setup D=D-A to check if they are zero, and we will jump if it is (w/ label)
 @R3             // A=R3         <-- location of last character
 D=M             // A=R3     D=M[R3]     <-- last character index (ABBA 9)
 A=D             // A=M[R3]  D=M[R3] <-- last character char
 D=M             // D[M[R3]]= M[R3]
-@R6             // A=R6     D=M[R3]
-A=M             // A=M[R6]  D=M[R3] <-- (first) character stored in A
+// the above will get last character in D is working
+
+// Get index of first character
+@R5             // A=R4         <-- location of first char
+A=M             // A=R4     D=M[R4] <--- offset of first char
+A=M
+
 // Check M[KBD+1] with M[R3] or first character and last 
 D=D-A
 @SETUP_NEXT_CHAR
 D;JEQ
 
-(STOP)
+// Not Equal, Fail
+@-1
+D=M
+@R0
+A=D
+(FAIL)
+@FAIL
+0;JMP
+
+(SUCCESS)
 @77
-@STOP
+@SUCCESS
 0;JMP
 
 // (CHECK_PALINDROME)
@@ -84,6 +124,16 @@ D;JEQ
 // 0;JMP
 
 (SETUP_NEXT_CHAR)
+
+// Check if R5 < R3, end successful
+@R3
+D=M
+@R5
+A=M
+D=D-A
+@SUCCESS
+D;JLE
+
 // Increment R4
 @R4         //A=R4
 D=M         //A=R4 D=M[R4]
@@ -93,7 +143,7 @@ M=D+1       //A=R4 D=M[R4] M[R4] = M[R4] + 1
 @R3         //A=R3
 D=M         //A=R3 D=M[R3]
 M=D-1       //A=R3 D=M[R3] M[R3] = M[R3] - 1
-@TEST
+@CHECK_PALINDROME
 0;JEQ
 
 @SETUP_NEXT_CHAR
